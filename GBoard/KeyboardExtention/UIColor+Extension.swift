@@ -6,3 +6,11 @@
 //
 
 import Foundation
+import UIKit
+
+
+extension UIColor {
+    static let darkerKeyColor = UIColor(named: "DarkerKeyboardColor")
+    static let basicKeyColor = UIColor(named: "BasicKeyboardColor")
+    static let gptColor = UIColor(named: "GPTColor")
+}
