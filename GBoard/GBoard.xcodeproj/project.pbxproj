@@ -31,6 +31,7 @@
 		C00DEC632B412F6F008F79B4 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = C00DEC622B412F6F008F79B4 /* RxRelay */; };
 		C00DEC662B41936D008F79B4 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00DEC652B41936D008F79B4 /* UIColor+Extension.swift */; };
 		C00DEC682B419683008F79B4 /* KeyboardColorExtention.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C00DEC672B419683008F79B4 /* KeyboardColorExtention.xcassets */; };
+		C00DEC6A2B42D58F008F79B4 /* HangulComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00DEC692B42D58F008F79B4 /* HangulComposer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		C00DEC3D2B412E92008F79B4 /* KeyboardInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = KeyboardInfo.plist; sourceTree = "<group>"; };
 		C00DEC652B41936D008F79B4 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		C00DEC672B419683008F79B4 /* KeyboardColorExtention.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = KeyboardColorExtention.xcassets; sourceTree = "<group>"; };
+		C00DEC692B42D58F008F79B4 /* HangulComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HangulComposer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				C00DEC3D2B412E92008F79B4 /* KeyboardInfo.plist */,
 				C00DEC652B41936D008F79B4 /* UIColor+Extension.swift */,
 				C00DEC672B419683008F79B4 /* KeyboardColorExtention.xcassets */,
+				C00DEC692B42D58F008F79B4 /* HangulComposer.swift */,
 			);
 			path = KeyboardExtention;
 			sourceTree = "<group>";
@@ -291,6 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C00DEC6A2B42D58F008F79B4 /* HangulComposer.swift in Sources */,
 				C00DEC3C2B412E92008F79B4 /* KeyboardViewController.swift in Sources */,
 				C00DEC662B41936D008F79B4 /* UIColor+Extension.swift in Sources */,
 			);
