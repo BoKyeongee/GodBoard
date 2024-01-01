@@ -154,7 +154,9 @@ class KeyboardViewController: UIInputViewController {
         deleteButton.tintColor = .label
         deleteButton.layer.cornerRadius = 5
         deleteButton.backgroundColor = .darkerKeyColor
-        deleteButton.addTarget(self, action: #selector(shiftButtonTapped(_:)), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteButtomTouchDown(_:)), for: .touchDown)
+        deleteButton.addTarget(self, action: #selector(deleteButtomTouchUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         deleteButton.snp.makeConstraints {
             $0.width.equalTo(buttonWidth + 5)
         }
@@ -260,16 +262,29 @@ class KeyboardViewController: UIInputViewController {
     }
     
     
+    // 백스페이스 버튼 기능
     @objc func deleteButtonTapped(_ sender: UIButton) {
         print("deleteButtonTapped")
-        sender.setImage(UIImage(named: "delete.backward.fill"), for: .selected)
-        sender.isSelected = !sender.isSelected
-        sender.setImage(UIImage(named: "delete.backward"), for: .selected)
-        
+        sender.backgroundColor = .basicKeyColor
+        sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
         let proxy = textDocumentProxy as UITextDocumentProxy
         proxy.deleteBackward()
     }
     
+    @objc func deleteButtomTouchDown(_ sender: UIButton) {
+        print("deleteButtomTouchDown")
+        sender.backgroundColor = .basicKeyColor
+        sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
+    }
+    
+    @objc func deleteButtomTouchUp(_ sender: UIButton) {
+        print("deleteButtomTouchUp")
+        sender.backgroundColor = .darkerKeyColor
+        sender.setImage(UIImage(systemName: "delete.backward"), for: .normal)
+    }
+    
+    
+    // 줄바꿈 기능
     @objc func enterButtonTapped(_ sender: UIButton) {
         print("enterButtonTapped")
         sender.setImage(UIImage(named: "return.fill"), for: .selected)
@@ -280,6 +295,8 @@ class KeyboardViewController: UIInputViewController {
         proxy.insertText("\n")
     }
     
+    
+    // 스페이스바 기능
     @objc func spaceButtonTapped(_ sender: UIButton) {
         print("spaceButtonTapped")
         let proxy = textDocumentProxy as UITextDocumentProxy
