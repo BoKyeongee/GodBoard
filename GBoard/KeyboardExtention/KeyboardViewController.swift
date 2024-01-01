@@ -61,6 +61,7 @@ enum KeyboardPage {
 class KeyboardViewController: UIInputViewController {
     
     var keyboardPage: KeyboardPage = .korean
+    var deleteTimer: Timer?
 
     // 🤔 코드 개선을 위한 고민 - switch를 이용한 함수를 만들면 중복을 없앨 수 있지 않을까?
     let firstRowEn = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]
@@ -154,9 +155,8 @@ class KeyboardViewController: UIInputViewController {
         deleteButton.tintColor = .label
         deleteButton.layer.cornerRadius = 5
         deleteButton.backgroundColor = .darkerKeyColor
-        deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector(deleteButtomTouchDown(_:)), for: .touchDown)
-        deleteButton.addTarget(self, action: #selector(deleteButtomTouchUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        deleteButton.addTarget(self, action: #selector(deleteButtonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         deleteButton.snp.makeConstraints {
             $0.width.equalTo(buttonWidth + 5)
         }
@@ -265,24 +265,30 @@ class KeyboardViewController: UIInputViewController {
     
     
     // 백스페이스 버튼 기능
-    @objc func deleteButtonTapped(_ sender: UIButton) {
-        print("deleteButtonTapped")
-        let proxy = textDocumentProxy as UITextDocumentProxy
-        proxy.deleteBackward()
-    }
-    
     @objc func deleteButtomTouchDown(_ sender: UIButton) {
         print("deleteButtomTouchDown")
         sender.backgroundColor = .basicKeyColor
         sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
+        deleteCharacter()
+        
+        // 지연 후 삭제를 위한 타이머 시작
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [self] in
+            deleteTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(deleteCharacter), userInfo: nil, repeats: true)
+        }
+        
     }
-    
-    @objc func deleteButtomTouchUp(_ sender: UIButton) {
-        print("deleteButtomTouchUp")
+
+    @objc func deleteButtonReleased(_ sender: UIButton) {
+        print("deleteButtonReleased")
         sender.backgroundColor = .darkerKeyColor
         sender.setImage(UIImage(systemName: "delete.backward"), for: .normal)
+        deleteTimer?.invalidate()
     }
-    
+
+    @objc func deleteCharacter() {
+        let proxy = textDocumentProxy as UITextDocumentProxy
+        proxy.deleteBackward()
+    }
     
     // 줄바꿈 기능
     @objc func enterButtonTapped(_ sender: UIButton) {
