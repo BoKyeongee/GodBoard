@@ -265,8 +265,6 @@ class KeyboardViewController: UIInputViewController {
     // 백스페이스 버튼 기능
     @objc func deleteButtonTapped(_ sender: UIButton) {
         print("deleteButtonTapped")
-        sender.backgroundColor = .basicKeyColor
-        sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
         let proxy = textDocumentProxy as UITextDocumentProxy
         proxy.deleteBackward()
     }
