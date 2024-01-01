@@ -200,7 +200,9 @@ class KeyboardViewController: UIInputViewController {
         spaceButton.setTitleColor(.label, for: .normal)
         spaceButton.backgroundColor = .basicKeyColor
         spaceButton.layer.cornerRadius = 5
-        spaceButton.addTarget(self, action: #selector(shiftButtonTapped(_:)), for: .touchUpInside)
+        spaceButton.addTarget(self, action: #selector(spaceButtonTapped(_:)), for: .touchUpInside)
+        spaceButton.addTarget(self, action: #selector(spaceButtomTouchDown(_:)), for: .touchDown)
+        spaceButton.addTarget(self, action: #selector(spaceButtomTouchUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
  
         spaceButton.snp.makeConstraints {
             $0.height.equalTo(45)
@@ -301,4 +303,13 @@ class KeyboardViewController: UIInputViewController {
         proxy.insertText(" ")
     }
     
+    @objc func spaceButtomTouchDown(_ sender: UIButton) {
+        print("spaceButtomTouchDown")
+        sender.backgroundColor = .basicKeyColor
+    }
+    
+    @objc func spaceButtomTouchUp(_ sender: UIButton) {
+        print("spaceButtomTouchUp")
+        sender.backgroundColor = .darkerKeyColor
+    }
 }
