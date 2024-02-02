@@ -8,6 +8,9 @@ import UIKit
 import SnapKit
 
 class KeyboardWrappingStackView: UIStackView {
+    
+    var deleteTimer: Timer?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -62,7 +65,7 @@ class KeyboardViewController: UIInputViewController {
     
     var keyboardPage: KeyboardPage = .korean
     var deleteTimer: Timer?
-
+    
     // 🤔 코드 개선을 위한 고민 - switch를 이용한 함수를 만들면 중복을 없앨 수 있지 않을까?
     let firstRowEn = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]
     let secondRowEn = ["A", "S", "D", "F", "G", "H", "J", "K", "L"]
@@ -76,8 +79,8 @@ class KeyboardViewController: UIInputViewController {
     let firstCapitalizeRowKo = ["ㅃ", "ㅉ", "ㄸ", "ㄲ", "ㅆ", "ㅛ", "ㅕ", "ㅑ", "ㅒ", "ㅖ"]
     let secondRowKo = ["ㅁ", "ㄴ", "ㅇ", "ㄹ", "ㅎ", "ㅗ", "ㅓ", "ㅏ", "ㅣ"]
     let thirdRowKo = ["ㅋ", "ㅌ", "ㅊ", "ㅍ", "ㅠ", "ㅜ", "ㅡ"]
-
-
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -115,7 +118,7 @@ class KeyboardViewController: UIInputViewController {
         let secondRowStackView = KeyboardRowStackView()
         secondRowStackView.isLayoutMarginsRelativeArrangement = true
         secondRowStackView.layoutMargins = UIEdgeInsets(top: .zero, left: buttonWidth / 2, bottom: .zero, right: buttonWidth / 2)
-
+        
         for key in secondRowKo {
             let button = createButtonWithTitle(title: key)
             button.snp.makeConstraints {
@@ -155,16 +158,16 @@ class KeyboardViewController: UIInputViewController {
         deleteButton.tintColor = .label
         deleteButton.layer.cornerRadius = 5
         deleteButton.backgroundColor = .darkerKeyColor
-        deleteButton.addTarget(self, action: #selector(deleteButtomTouchDown(_:)), for: .touchDown)
+        deleteButton.addTarget(self, action: #selector(deleteButtonTouchDown(_:)), for: .touchDown)
         deleteButton.addTarget(self, action: #selector(deleteButtonReleased(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         deleteButton.snp.makeConstraints {
             $0.width.equalTo(buttonWidth + 5)
         }
         let secondBlank = EmptyView()
-
+        
         thirdRowStackView.addArrangedSubview(secondBlank)
         thirdRowStackView.addArrangedSubview(deleteButton)
-
+        
         // 네 번째 줄 stackView - 한글
         // 아래쪽에 지구본이랑 음성뜨는 설정해야 함(iphone SE 등 옛날 기종 중 홈버튼 있는거는 안됨)
         let fourthRowStackView = KeyboardRowStackView()
@@ -194,7 +197,7 @@ class KeyboardViewController: UIInputViewController {
         fourthRowStackView.addArrangedSubview(globeButton)
         
         let spaceButton = UIButton()
-    
+        
         spaceButton.setTitle("스페이스", for: .normal)
         spaceButton.titleLabel?.font = .systemFont(ofSize: 15)
         spaceButton.setTitleColor(.label, for: .normal)
@@ -203,7 +206,7 @@ class KeyboardViewController: UIInputViewController {
         spaceButton.addTarget(self, action: #selector(spaceButtonTapped(_:)), for: .touchUpInside)
         spaceButton.addTarget(self, action: #selector(spaceButtomTouchDown(_:)), for: .touchDown)
         spaceButton.addTarget(self, action: #selector(spaceButtomTouchUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
- 
+        
         spaceButton.snp.makeConstraints {
             $0.height.equalTo(45)
         }
@@ -215,6 +218,8 @@ class KeyboardViewController: UIInputViewController {
         enterButton.backgroundColor = .darkerKeyColor
         enterButton.layer.cornerRadius = 5
         enterButton.addTarget(self, action: #selector(enterButtonTapped(_:)), for: .touchUpInside)
+        enterButton.addTarget(self, action: #selector(enterButtomTouchDown(_:)), for: .touchDown)
+        enterButton.addTarget(self, action: #selector(enterButtomTouchUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         enterButton.snp.makeConstraints {
             $0.width.equalTo(buttonWidth * 2)
         }
@@ -250,13 +255,14 @@ class KeyboardViewController: UIInputViewController {
         }
         return button
     }
-
+    
     @objc func keyTapped(_ sender: UIButton) {
         guard let key = sender.titleLabel?.text else { return }
         let proxy = textDocumentProxy as UITextDocumentProxy
         proxy.insertText(key)
     }
     
+    // 기능 구현 아직 안함
     @objc func shiftButtonTapped(_ sender: UIButton) {
         sender.backgroundColor = .label
         sender.setImage(UIImage(named: "shift.fill"), for: .normal)
@@ -265,26 +271,42 @@ class KeyboardViewController: UIInputViewController {
     
     
     // 백스페이스 버튼 기능
-    @objc func deleteButtomTouchDown(_ sender: UIButton) {
-        print("deleteButtomTouchDown")
+    //    @objc func deleteButtomTouchDown(_ sender: UIButton) {
+    //        print("deleteButtomTouchDown")
+    //        sender.backgroundColor = .basicKeyColor
+    //        sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
+    //        deleteCharacter()
+    //
+    //        // 지연 후 삭제를 위한 타이머 시작
+    //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [self] in
+    //            deleteTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(deleteCharacter), userInfo: nil, repeats: true)
+    //        }
+    //
+    //    }
+    //
+    //    @objc func deleteButtonReleased(_ sender: UIButton) {
+    //        print("deleteButtonReleased")
+    //        sender.backgroundColor = .darkerKeyColor
+    //        sender.setImage(UIImage(systemName: "delete.backward"), for: .normal)
+    //        deleteTimer?.invalidate()
+    //    }
+    
+    
+    @objc func deleteButtonTouchDown(_ sender: UIButton) {
         sender.backgroundColor = .basicKeyColor
-        sender.setImage(UIImage(systemName: "delete.backward.fill"), for: .normal)
-        deleteCharacter()
+        deleteCharacter() // 첫 번째 문자 즉시 삭제
         
-        // 지연 후 삭제를 위한 타이머 시작
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [self] in
-            deleteTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(deleteCharacter), userInfo: nil, repeats: true)
-        }
-        
+        // 연속 삭제를 위한 타이머 시작 (초기 지연 후)
+        deleteTimer?.invalidate() // 혹시 모를 이전 타이머 정리
+        deleteTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(deleteCharacter), userInfo: nil, repeats: true) // Timer 객체 생성
+        deleteTimer?.fireDate = Date().addingTimeInterval(0.6) // Timer 실행 시점 지정
     }
-
+    
     @objc func deleteButtonReleased(_ sender: UIButton) {
-        print("deleteButtonReleased")
         sender.backgroundColor = .darkerKeyColor
-        sender.setImage(UIImage(systemName: "delete.backward"), for: .normal)
-        deleteTimer?.invalidate()
+        deleteTimer?.invalidate() // 버튼에서 손을 뗐을 때 타이머 중지
     }
-
+    
     @objc func deleteCharacter() {
         let proxy = textDocumentProxy as UITextDocumentProxy
         proxy.deleteBackward()
@@ -293,12 +315,20 @@ class KeyboardViewController: UIInputViewController {
     // 줄바꿈 기능
     @objc func enterButtonTapped(_ sender: UIButton) {
         print("enterButtonTapped")
-        sender.setImage(UIImage(named: "return.fill"), for: .selected)
-        sender.isSelected = !sender.isSelected
-        sender.setImage(UIImage(named: "return"), for: .selected)
-        
         let proxy = textDocumentProxy as UITextDocumentProxy
         proxy.insertText("\n")
+    }
+    
+    @objc func enterButtomTouchDown(_ sender: UIButton) {
+        print("enterButtomTouchDown")
+        sender.setImage(UIImage(named: "return.fill"), for: .selected)
+        sender.backgroundColor = .basicKeyColor
+    }
+    
+    @objc func enterButtomTouchUp(_ sender: UIButton) {
+        print("enterButtomTouchUp")
+        sender.setImage(UIImage(named: "return"), for: .selected)
+        sender.backgroundColor = .darkerKeyColor
     }
     
     
@@ -311,11 +341,11 @@ class KeyboardViewController: UIInputViewController {
     
     @objc func spaceButtomTouchDown(_ sender: UIButton) {
         print("spaceButtomTouchDown")
-        sender.backgroundColor = .basicKeyColor
+        sender.backgroundColor = .darkerKeyColor
     }
     
     @objc func spaceButtomTouchUp(_ sender: UIButton) {
         print("spaceButtomTouchUp")
-        sender.backgroundColor = .darkerKeyColor
+        sender.backgroundColor = .basicKeyColor
     }
 }
